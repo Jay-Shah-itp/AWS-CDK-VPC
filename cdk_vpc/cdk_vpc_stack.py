@@ -10,9 +10,14 @@ class CdkVpcStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        vpc_cidr = self.node.try_get_context('vpc_cidr')
+        env_type = self.node.try_get_context('env_type')
+
         self.vpc = Vpc(
-            self, config.VPC, cidr=config.VPC_CIDR, nat_gateways=0, subnet_configuration=[]
+            self, config.VPC, cidr=vpc_cidr, nat_gateways=0, subnet_configuration=[]
         )
+
+        self.vpc.Tags.of(self.vpc).add('Environment', env_type)
 
         self.internet_gateway = self.attach_internet_gateway()
 
